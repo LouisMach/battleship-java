@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Unit Tests
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     container:
       image: amazoncorretto:17
