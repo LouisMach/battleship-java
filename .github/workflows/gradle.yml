@@ -1,0 +1,88 @@
+name: CI Pipeline
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    container:
+      image: amazoncorretto:17
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run Unit Tests
+        run: ./gradlew test jacocoTestReport
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    container:
+      image: amazoncorretto:17
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build Project
+        run: ./gradlew build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: distributions
+          path: ./console-app/build/distributions
+
+  analyze:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: amazoncorretto:17
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_URL: ${{ secrets.SONAR_URL }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
+        run: ./gradlew build jacocoTestReport sonarqube -Dsonar.host.url=${{ secrets.SONAR_URL }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.login=${{ secrets.SONAR_LOGIN }}
