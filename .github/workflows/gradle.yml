@@ -40,7 +40,7 @@ jobs:
             -Dsonar.projectKey=samueladesoga_battleship-java
             -Dsonar.organization=samueladesoga
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=85893e524940ee055887cc58c9bc85f7f2e52d94
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Upload JaCoCo report to SonarCloud
         run: |
@@ -48,5 +48,5 @@ jobs:
             -Dsonar.projectKey=samueladesoga_battleship-java \
             -Dsonar.organization=samueladesoga \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=85893e524940ee055887cc58c9bc85f7f2e52d94 \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
