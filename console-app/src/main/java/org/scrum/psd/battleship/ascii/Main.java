@@ -108,7 +108,8 @@ public class Main {
             System.out.println("");
             System.out.println("-------------------------------------------------------------------------------");
             System.out.println("|----------------------------------COMPUTER-----------------------------------|");
-            System.out.println("-------------------------------------------------------------------------------");            System.out.println(String.format("Computer shoot in %s%s and %s", position.getColumn(), position.getRow(), isHit ? "hit your ship !" : "miss"));
+            System.out.println("-------------------------------------------------------------------------------");            
+            System.out.println(String.format("Computer shoot in %s%s and %s", position.getColumn(), position.getRow(), isHit ? "hit your ship !" : "miss"));
 
             if (isHit) {
                 printHit(String.format("Computer shoot in %s%s and hit your ship !", position.getColumn(), position.getRow()));
