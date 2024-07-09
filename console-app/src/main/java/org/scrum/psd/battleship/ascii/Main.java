@@ -247,6 +247,6 @@ public class Main {
         enemyFleet.get(3).getPositions().add(new Position(Letter.H, 8));
 
         enemyFleet.get(4).getPositions().add(new Position(Letter.C, 5));
-        enemyFleet.get(4).getPositions().add(new Position(Letter.C, 6));+
+        enemyFleet.get(4).getPositions().add(new Position(Letter.C, 6));
     }
 }
