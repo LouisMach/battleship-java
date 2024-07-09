@@ -13,6 +13,8 @@ import static com.diogonunes.jcolor.Attribute.*;
 public class Main {
     private static List<Ship> myFleet;
     private static List<Ship> enemyFleet;
+    private static List<Position> myUsedPositions = new ArrayList<>();
+
 
     private static final Telemetry telemetry = new Telemetry();
 
@@ -56,8 +58,22 @@ public class Main {
         do {
             System.out.println("");
             System.out.println("Player, it's your turn");
+
+            // display grid for user to select
+            displayGrid();
+
             System.out.println("Enter coordinates for your shot :");
             Position position = parsePosition(scanner.next());
+            // check my positions already used
+            while (myUsedPositions.contains(position))
+            {
+                System.out.println("Position already used. Enter new coordinates for your shot:");
+                position = parsePosition(scanner.next());
+            }
+
+            // add to used positions
+            myUsedPositions.add(position);
+
             boolean isHit = GameController.checkIsHit(enemyFleet, position);
             if (isHit) {
                 beep();
@@ -115,6 +131,33 @@ public class Main {
 
     private static void printHit(String text){
         System.out.println(colorize(text, RED_TEXT()));
+    }
+
+    private static void displayGrid() {
+        // a - h
+        System.out.print("   ");
+        for (char c = 'a'; c <= 'h'; c++) {
+            System.out.print(" " + c + "  |");
+        }
+        System.out.println();
+
+        for (int i = 1; i <= 8; i++) {
+            // 1 - 8
+            System.out.print(" " + i + " ");
+
+            // board
+            for (char c = 'a'; c <= 'h'; c++) {
+                Letter columnLetter = Letter.values()[c - 'a']; // Convert char to Letter enum
+                Position current = new Position(columnLetter, i);
+                if (myUsedPositions.contains(current)) {
+                    System.out.print(" x ");
+                } else {
+                    System.out.print("   "); // Use empty space
+                }
+                System.out.print(" |");
+            }
+            System.out.println();
+        }
     }
 
     private static void beep() {
