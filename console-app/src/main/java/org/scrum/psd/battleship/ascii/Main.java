@@ -43,6 +43,10 @@ public class Main {
     private static void StartGame() {
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println("|------------------------------ENEMY-FLEET-FOUND------------------------------|");
+        System.out.println("-------------------------------------------------------------------------------");
+
         System.out.print("\033[2J\033[;H");
         System.out.println("                  __");
         System.out.println("                 /  \\");
@@ -56,7 +60,9 @@ public class Main {
         System.out.println("    \" \"\" \"\" \"\" \"");
 
         do {
-            System.out.println("");
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("|-----------------------------------PLAYER------------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------");
             System.out.println("Player, it's your turn");
 
             // display grid for user to select
@@ -100,6 +106,9 @@ public class Main {
             position = getRandomPosition();
             isHit = GameController.checkIsHit(myFleet, position);
             System.out.println("");
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("|----------------------------------COMPUTER-----------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------");            System.out.println(String.format("Computer shoot in %s%s and %s", position.getColumn(), position.getRow(), isHit ? "hit your ship !" : "miss"));
 
             if (isHit) {
                 printHit(String.format("Computer shoot in %s%s and hit your ship !", position.getColumn(), position.getRow()));
@@ -120,7 +129,6 @@ public class Main {
                 System.out.println("            -   (\\- |  \\ /  |  /)  -");
                 System.out.println("                 -\\  \\     /  /-");
                 System.out.println("                   \\  \\   /  /");
-
             }
         } while (true);
     }
@@ -189,7 +197,9 @@ public class Main {
     private static void InitializeMyFleet() {
         Scanner scanner = new Scanner(System.in);
         myFleet = GameController.initializeShips();
-
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println("|-------------------------------COORDINATE-FLEET-------------------------------|");
+        System.out.println("-------------------------------------------------------------------------------");
         System.out.println("Please position your fleet (Game board has size from A to H and 1 to 8) :");
 
         for (Ship ship : myFleet) {
