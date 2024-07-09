@@ -62,6 +62,7 @@ public class Main {
             if (isHit) {
                 beep();
 
+
                 System.out.println("                \\         .  ./");
                 System.out.println("              \\      .:\" \";'.:..\" \"   /");
                 System.out.println("                  (M^^.^~~:.'\" \").");
@@ -72,13 +73,25 @@ public class Main {
                 System.out.println("                   \\  \\   /  /");
             }
 
-            System.out.println(isHit ? "Yeah ! Nice hit !" : "Miss");
+            if (isHit) {
+                printHit("Yeah ! Nice hit !");
+            }
+            else{
+                printMiss("Miss");
+            }
             telemetry.trackEvent("Player_ShootPosition", "Position", position.toString(), "IsHit", Boolean.valueOf(isHit).toString());
 
             position = getRandomPosition();
             isHit = GameController.checkIsHit(myFleet, position);
             System.out.println("");
-            System.out.println(String.format("Computer shoot in %s%s and %s", position.getColumn(), position.getRow(), isHit ? "hit your ship !" : "miss"));
+
+            if (isHit) {
+                printHit(String.format("Computer shoot in %s%s and hit your ship !", position.getColumn(), position.getRow()));
+            }
+            else{
+                printMiss(String.format("Computer shoot in %s%s and miss", position.getColumn(), position.getRow()));
+            }
+
             telemetry.trackEvent("Computer_ShootPosition", "Position", position.toString(), "IsHit", Boolean.valueOf(isHit).toString());
             if (isHit) {
                 beep();
@@ -94,6 +107,14 @@ public class Main {
 
             }
         } while (true);
+    }
+
+    private static void printMiss(String text){
+        System.out.println(colorize(text, BLUE_TEXT()));
+    }
+
+    private static void printHit(String text){
+        System.out.println(colorize(text, RED_TEXT()));
     }
 
     private static void beep() {
