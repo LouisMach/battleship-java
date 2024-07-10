@@ -17,6 +17,7 @@ public class Main {
     private static List<Ship> enemyFleet;
     private static List<Position> myMissedPositions = new ArrayList<>();
     private static List<Position> myHitPositions = new ArrayList<>();
+    private static List<Position> computerPositions = new ArrayList<>();
 
     private static int maxGridRow = 8;
     private static char maxGridColumn = 'h';
@@ -115,8 +116,17 @@ public class Main {
                 printMiss("Miss");
             }
             telemetry.trackEvent("Player_ShootPosition", "Position", position.toString(), "IsHit", Boolean.valueOf(isHit).toString());
-
+            
+            // computer playing
             position = getRandomPosition();
+            while (computerPositions.contains(position))
+            {
+                System.out.println("Position already used. Computer is retrying");
+                position = getRandomPosition();
+            }
+
+            computerPositions.add(position);
+
             isHit = GameController.checkIsHit(myFleet, position);
             System.out.println("");
             System.out.println("-------------------------------------------------------------------------------");
@@ -200,6 +210,41 @@ public class Main {
         }
     }
 
+    private static void displayShipGrid(List<Ship> enemyFleet) {
+        System.out.print("   |");
+        for (char c = 'a'; c <= maxGridColumn; c++) {
+            System.out.print(" " + c + "  |");
+        }
+        System.out.println();
+        for (int i = 1; i <= maxGridRow; i++) {
+            System.out.println("--------------------------------------------");
+            System.out.print(" " + i + " |");
+            for (char c = 'a'; c <= maxGridColumn; c++) {
+                Letter columnLetter = Letter.values()[c - 'a'];
+                Position current = new Position(columnLetter, i);
+                boolean isShipPosition = false;
+                for (Ship ship : enemyFleet) {
+                    for (Position shipPosition : ship.getPositions()) {
+                        if (shipPosition.equals(current)) {
+                            isShipPosition = true;
+                            break;
+                        }
+                    }
+                    if (isShipPosition) {
+                        break;
+                    }
+                }
+                if (isShipPosition) {
+                    System.out.print(colorize(" x ", GREEN_TEXT()));
+                } else {
+                    System.out.print("   "); // Use empty space
+                }
+                System.out.print(" |");
+            }
+            System.out.println();
+        }
+    }
+
     private static void beep() {
         System.out.print("\007");
     }
@@ -245,6 +290,8 @@ public class Main {
                 telemetry.trackEvent("Player_PlaceShipPosition", "Position", positionInput, "Ship", ship.getName(), "PositionInShip", Integer.valueOf(i).toString());
             }
         }
+
+        displayShipGrid(myFleet);
     }
 
     private static void InitializeEnemyFleet() {
