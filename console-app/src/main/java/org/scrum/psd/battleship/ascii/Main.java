@@ -6,6 +6,8 @@ import org.scrum.psd.battleship.controller.dto.Position;
 import org.scrum.psd.battleship.controller.dto.Ship;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 import static com.diogonunes.jcolor.Attribute.*;
@@ -13,7 +15,8 @@ import static com.diogonunes.jcolor.Attribute.*;
 public class Main {
     private static List<Ship> myFleet;
     private static List<Ship> enemyFleet;
-    private static List<Position> myUsedPositions = new ArrayList<>();
+    private static List<Position> myMissedPositions = new ArrayList<>();
+    private static List<Position> myHitPositions = new ArrayList<>();
 
     private static int maxGridRow = 8;
     private static char maxGridColumn = 'h';
@@ -46,6 +49,10 @@ public class Main {
     private static void StartGame() {
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println("|------------------------------ENEMY-FLEET-FOUND------------------------------|");
+        System.out.println("-------------------------------------------------------------------------------");
+
         System.out.print("\033[2J\033[;H");
         System.out.println("                  __");
         System.out.println("                 /  \\");
@@ -59,7 +66,9 @@ public class Main {
         System.out.println("    \" \"\" \"\" \"\" \"");
 
         do {
-            System.out.println("");
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("|-----------------------------------PLAYER------------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------");
             System.out.println("Player, it's your turn");
 
             // display grid for user to select
@@ -80,28 +89,29 @@ public class Main {
                 }
             }
 
-            // add to used positions
-            myUsedPositions.add(position);
-
             boolean isHit = GameController.checkIsHit(enemyFleet, position);
             if (isHit) {
                 beep();
 
 
-                System.out.println("                \\         .  ./");
-                System.out.println("              \\      .:\" \";'.:..\" \"   /");
-                System.out.println("                  (M^^.^~~:.'\" \").");
-                System.out.println("            -   (/  .    . . \\ \\)  -");
-                System.out.println("               ((| :. ~ ^  :. .|))");
-                System.out.println("            -   (\\- |  \\ /  |  /)  -");
-                System.out.println("                 -\\  \\     /  /-");
-                System.out.println("                   \\  \\   /  /");
+                System.out.println("          _ ._  _ , _ ._");
+                System.out.println("        (_ ' ( `  )_  .__)");
+                System.out.println("      ( (  (    )   `)  ) _)");
+                System.out.println("     (__ (_   (_ . _) _) ,__)");
+                System.out.println("         `~~`\\ ' . /`~~`");
+                System.out.println("              ;   ;");
+                System.out.println("              /   \\");
+                System.out.println("_____________/_ __ \\_____________");
             }
 
             if (isHit) {
+                // add to hit positions
+                myHitPositions.add(position);
                 printHit("Yeah ! Nice hit !");
             }
             else{
+                // add to missed positions
+                myMissedPositions.add(position);
                 printMiss("Miss");
             }
             telemetry.trackEvent("Player_ShootPosition", "Position", position.toString(), "IsHit", Boolean.valueOf(isHit).toString());
@@ -109,6 +119,9 @@ public class Main {
             position = getRandomPosition();
             isHit = GameController.checkIsHit(myFleet, position);
             System.out.println("");
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("|----------------------------------COMPUTER-----------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------");
 
             if (isHit) {
                 printHit(String.format("Computer shoot in %s%s and hit your ship !", position.getColumn(), position.getRow()));
@@ -121,20 +134,20 @@ public class Main {
             if (isHit) {
                 beep();
 
-                System.out.println("                \\         .  ./");
-                System.out.println("              \\      .:\" \";'.:..\" \"   /");
-                System.out.println("                  (M^^.^~~:.'\" \").");
-                System.out.println("            -   (/  .    . . \\ \\)  -");
-                System.out.println("               ((| :. ~ ^  :. .|))");
-                System.out.println("            -   (\\- |  \\ /  |  /)  -");
-                System.out.println("                 -\\  \\     /  /-");
-                System.out.println("                   \\  \\   /  /");
-
+                System.out.println("          _ ._  _ , _ ._");
+                System.out.println("        (_ ' ( `  )_  .__)");
+                System.out.println("      ( (  (    )   `)  ) _)");
+                System.out.println("     (__ (_   (_ . _) _) ,__)");
+                System.out.println("         `~~`\\ ' . /`~~`");
+                System.out.println("              ;   ;");
+                System.out.println("              /   \\");
+                System.out.println("_____________/_ __ \\_____________");
             }
         } while (true);
     }
 
     private static boolean validateShot(Position position){
+        List<Position> myUsedPositions = Stream.concat(myHitPositions.stream(), myMissedPositions.stream()).collect(Collectors.toList());
         if (myUsedPositions.contains(position)){
             System.out.println("Position already used. Enter new coordinates for your shot:");
             return false;
@@ -156,23 +169,29 @@ public class Main {
 
     private static void displayGrid() {
         // a - h
-        System.out.print("   ");
+        System.out.print("   |");
         for (char c = 'a'; c <= maxGridColumn; c++) {
             System.out.print(" " + c + "  |");
         }
         System.out.println();
 
         for (int i = 1; i <= maxGridRow; i++) {
+            System.out.println("--------------------------------------------");
+
             // 1 - 8
-            System.out.print(" " + i + " ");
+            System.out.print(" " + i + " |");
 
             // board
             for (char c = 'a'; c <= maxGridColumn; c++) {
                 Letter columnLetter = Letter.values()[c - 'a']; // Convert char to Letter enum
                 Position current = new Position(columnLetter, i);
-                if (myUsedPositions.contains(current)) {
-                    System.out.print(" x ");
-                } else {
+                if (myMissedPositions.contains(current)) {
+                    System.out.print(colorize(" x ", CYAN_TEXT()));
+                }
+                else if (myHitPositions.contains(current)) {
+                    System.out.print(colorize(" x ", RED_TEXT()));
+                }
+                else {
                     System.out.print("   "); // Use empty space
                 }
                 System.out.print(" |");
@@ -210,7 +229,9 @@ public class Main {
     private static void InitializeMyFleet() {
         Scanner scanner = new Scanner(System.in);
         myFleet = GameController.initializeShips();
-
+        System.out.println("-------------------------------------------------------------------------------");
+        System.out.println("|-------------------------------COORDINATE-FLEET-------------------------------|");
+        System.out.println("-------------------------------------------------------------------------------");
         System.out.println("Please position your fleet (Game board has size from A to H and 1 to 8) :");
 
         for (Ship ship : myFleet) {
