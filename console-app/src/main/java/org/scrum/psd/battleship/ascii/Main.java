@@ -13,7 +13,8 @@ import static com.diogonunes.jcolor.Attribute.*;
 public class Main {
     private static List<Ship> myFleet;
     private static List<Ship> enemyFleet;
-    private static List<Position> myUsedPositions = new ArrayList<>();
+    private static List<Position> myMissedPositions = new ArrayList<>();
+    private static List<Position> myHitPositions = new ArrayList<>();
 
 
     private static final Telemetry telemetry = new Telemetry();
@@ -71,34 +72,35 @@ public class Main {
             System.out.println("Enter coordinates for your shot :");
             Position position = parsePosition(scanner.next());
             // check my positions already used
-            while (myUsedPositions.contains(position))
+            while (myMissedPositions.contains(position) || myHitPositions.contains(position))
             {
                 System.out.println("Position already used. Enter new coordinates for your shot:");
                 position = parsePosition(scanner.next());
             }
-
-            // add to used positions
-            myUsedPositions.add(position);
 
             boolean isHit = GameController.checkIsHit(enemyFleet, position);
             if (isHit) {
                 beep();
 
 
-                System.out.println("                \\         .  ./");
-                System.out.println("              \\      .:\" \";'.:..\" \"   /");
-                System.out.println("                  (M^^.^~~:.'\" \").");
-                System.out.println("            -   (/  .    . . \\ \\)  -");
-                System.out.println("               ((| :. ~ ^  :. .|))");
-                System.out.println("            -   (\\- |  \\ /  |  /)  -");
-                System.out.println("                 -\\  \\     /  /-");
-                System.out.println("                   \\  \\   /  /");
+                System.out.println("          _ ._  _ , _ ._");
+                System.out.println("        (_ ' ( `  )_  .__)");
+                System.out.println("      ( (  (    )   `)  ) _)");
+                System.out.println("     (__ (_   (_ . _) _) ,__)");
+                System.out.println("         `~~`\\ ' . /`~~`");
+                System.out.println("              ;   ;");
+                System.out.println("              /   \\");
+                System.out.println("_____________/_ __ \\_____________");
             }
 
             if (isHit) {
+                // add to hit positions
+                myHitPositions.add(position);
                 printHit("Yeah ! Nice hit !");
             }
             else{
+                // add to missed positions
+                myMissedPositions.add(position);
                 printMiss("Miss");
             }
             telemetry.trackEvent("Player_ShootPosition", "Position", position.toString(), "IsHit", Boolean.valueOf(isHit).toString());
@@ -122,14 +124,14 @@ public class Main {
             if (isHit) {
                 beep();
 
-                System.out.println("                \\         .  ./");
-                System.out.println("              \\      .:\" \";'.:..\" \"   /");
-                System.out.println("                  (M^^.^~~:.'\" \").");
-                System.out.println("            -   (/  .    . . \\ \\)  -");
-                System.out.println("               ((| :. ~ ^  :. .|))");
-                System.out.println("            -   (\\- |  \\ /  |  /)  -");
-                System.out.println("                 -\\  \\     /  /-");
-                System.out.println("                   \\  \\   /  /");
+                System.out.println("          _ ._  _ , _ ._");
+                System.out.println("        (_ ' ( `  )_  .__)");
+                System.out.println("      ( (  (    )   `)  ) _)");
+                System.out.println("     (__ (_   (_ . _) _) ,__)");
+                System.out.println("         `~~`\\ ' . /`~~`");
+                System.out.println("              ;   ;");
+                System.out.println("              /   \\");
+                System.out.println("_____________/_ __ \\_____________");
             }
         } while (true);
     }
@@ -144,23 +146,29 @@ public class Main {
 
     private static void displayGrid() {
         // a - h
-        System.out.print("   ");
+        System.out.print("   |");
         for (char c = 'a'; c <= 'h'; c++) {
             System.out.print(" " + c + "  |");
         }
         System.out.println();
 
         for (int i = 1; i <= 8; i++) {
-            // 1 - 8
-            System.out.print(" " + i + " ");
+            System.out.println("--------------------------------------------");
 
+            // 1 - 8
+            System.out.print(" " + i + " |");
+            
             // board
             for (char c = 'a'; c <= 'h'; c++) {
                 Letter columnLetter = Letter.values()[c - 'a']; // Convert char to Letter enum
                 Position current = new Position(columnLetter, i);
-                if (myUsedPositions.contains(current)) {
-                    System.out.print(" x ");
-                } else {
+                if (myMissedPositions.contains(current)) {
+                    System.out.print(colorize(" x ", CYAN_TEXT()));
+                } 
+                else if (myHitPositions.contains(current)) {
+                    System.out.print(colorize(" x ", RED_TEXT()));
+                } 
+                else {
                     System.out.print("   "); // Use empty space
                 }
                 System.out.print(" |");
