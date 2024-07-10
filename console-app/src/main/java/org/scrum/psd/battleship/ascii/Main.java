@@ -109,6 +109,13 @@ public class Main {
                 // add to hit positions
                 myHitPositions.add(position);
                 printHit("Yeah ! Nice hit !");
+
+                if(!checkAnyPositionsLeft(enemyFleet, myHitPositions)){
+                    System.out.println("-------------------------------------------------------------------------------");
+                    System.out.println("|------------------------------------WIN--------------------------------------|");
+                    System.out.println("-------------------------------------------------------------------------------");
+                    System.exit(0);
+                }
             }
             else{
                 // add to missed positions
@@ -152,6 +159,13 @@ public class Main {
                 System.out.println("              ;   ;");
                 System.out.println("              /   \\");
                 System.out.println("_____________/_ __ \\_____________");
+
+                if(!checkAnyPositionsLeft(myFleet, computerPositions)){
+                    System.out.println("-------------------------------------------------------------------------------");
+                    System.out.println("|------------------------------------LOSE--------------------------------------|");
+                    System.out.println("-------------------------------------------------------------------------------");
+                    System.exit(0);
+                }
             }
         } while (true);
     }
@@ -168,6 +182,17 @@ public class Main {
         }
         return true;
     }
+
+    private static boolean checkAnyPositionsLeft(List<Ship> myFleet, List<Position> computerPositions){
+        for (Ship ship : myFleet) {
+            for (Position position : ship.getPositions()) {
+                if(!computerPositions.contains(position))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 
     private static void printMiss(String text){
         System.out.println(colorize(text, BLUE_TEXT()));
@@ -299,7 +324,8 @@ public class Main {
 
         enemyFleet.get(0).getPositions().add(new Position(Letter.B, 4));
         enemyFleet.get(0).getPositions().add(new Position(Letter.B, 5));
-        enemyFleet.get(0).getPositions().add(new Position(Letter.B, 6));
+        /*
+               enemyFleet.get(0).getPositions().add(new Position(Letter.B, 6));
         enemyFleet.get(0).getPositions().add(new Position(Letter.B, 7));
         enemyFleet.get(0).getPositions().add(new Position(Letter.B, 8));
 
@@ -318,5 +344,7 @@ public class Main {
 
         enemyFleet.get(4).getPositions().add(new Position(Letter.C, 5));
         enemyFleet.get(4).getPositions().add(new Position(Letter.C, 6));
+         */
+
     }
 }
