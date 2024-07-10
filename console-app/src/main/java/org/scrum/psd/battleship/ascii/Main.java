@@ -6,6 +6,8 @@ import org.scrum.psd.battleship.controller.dto.Position;
 import org.scrum.psd.battleship.controller.dto.Ship;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 import static com.diogonunes.jcolor.Attribute.*;
@@ -15,6 +17,9 @@ public class Main {
     private static List<Ship> enemyFleet;
     private static List<Position> myMissedPositions = new ArrayList<>();
     private static List<Position> myHitPositions = new ArrayList<>();
+
+    private static int maxGridRow = 8;
+    private static char maxGridColumn = 'h';
 
 
     private static final Telemetry telemetry = new Telemetry();
@@ -70,12 +75,18 @@ public class Main {
             displayGrid();
 
             System.out.println("Enter coordinates for your shot :");
-            Position position = parsePosition(scanner.next());
+            boolean isValidShot = false;
             // check my positions already used
-            while (myMissedPositions.contains(position) || myHitPositions.contains(position))
+            Position position = null;
+            while (!isValidShot)
             {
-                System.out.println("Position already used. Enter new coordinates for your shot:");
-                position = parsePosition(scanner.next());
+                try{
+                    position = parsePosition(scanner.next());
+                    isValidShot = validateShot(position);
+                }
+                catch (IllegalArgumentException exception){
+                    System.out.println("Position cant be parsed.");
+                }
             }
 
             boolean isHit = GameController.checkIsHit(enemyFleet, position);
@@ -135,6 +146,19 @@ public class Main {
         } while (true);
     }
 
+    private static boolean validateShot(Position position){
+        List<Position> myUsedPositions = Stream.concat(myHitPositions.stream(), myMissedPositions.stream()).collect(Collectors.toList());
+        if (myUsedPositions.contains(position)){
+            System.out.println("Position already used. Enter new coordinates for your shot:");
+            return false;
+        }
+        if (position.getRow() < 1 || position.getRow() > maxGridRow || position.getColumn().toString().charAt(0) > maxGridColumn){
+            System.out.println("Your shot is outside the grid, try again:");
+            return false;
+        }
+        return true;
+    }
+
     private static void printMiss(String text){
         System.out.println(colorize(text, BLUE_TEXT()));
     }
@@ -146,27 +170,27 @@ public class Main {
     private static void displayGrid() {
         // a - h
         System.out.print("   |");
-        for (char c = 'a'; c <= 'h'; c++) {
+        for (char c = 'a'; c <= maxGridColumn; c++) {
             System.out.print(" " + c + "  |");
         }
         System.out.println();
 
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= maxGridRow; i++) {
             System.out.println("--------------------------------------------");
 
             // 1 - 8
             System.out.print(" " + i + " |");
-            
+
             // board
-            for (char c = 'a'; c <= 'h'; c++) {
+            for (char c = 'a'; c <= maxGridColumn; c++) {
                 Letter columnLetter = Letter.values()[c - 'a']; // Convert char to Letter enum
                 Position current = new Position(columnLetter, i);
                 if (myMissedPositions.contains(current)) {
                     System.out.print(colorize(" x ", CYAN_TEXT()));
-                } 
+                }
                 else if (myHitPositions.contains(current)) {
                     System.out.print(colorize(" x ", RED_TEXT()));
-                } 
+                }
                 else {
                     System.out.print("   "); // Use empty space
                 }
